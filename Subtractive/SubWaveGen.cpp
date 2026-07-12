@@ -67,7 +67,7 @@ void SynthInit(void)
 	gFilter = NLFilter();
 
 	// Default test preset
-	SetFloatParam(ASP_GAIN, 1.4f);
+	SetFloatParam(ASP_GAIN, 0.7f);
 	SetIntParam(ASP_DCO_WAVE_TYPE_1, OSC_MODE_SAW);
 	SetFloatParam(ASP_DCO_TUNE_1, 1.0f);
 	SetFloatParam(ASP_DCO_VOL_1, 0.75f);
@@ -157,7 +157,7 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		}
 	}
 	int32_t delayFeedbackVol = (uint32_t)(GetFloatParam(ASP_DELAY_FEEDBACK) * 32768.0f);
-	uint16_t delayGlide = (uint16_t)(GetFloatParam(ASP_DELAY_SHEAR) * 3.0f) + 2;
+	uint16_t delayGlide = (uint16_t)(GetFloatParam(ASP_DELAY_SHEAR) * 275.0f) + 2;
 
 	uint32_t delayReadHead;
 
@@ -238,8 +238,8 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		y = gFilter.NextSample(y);
 
 		/*--- Drive & Gain ---*/
-		//y = drive * DrivenSample(y) + (1.0f - drive) * y;
-		//y *= gain;
+		y = drive * DrivenSample(y) + (1.0f - drive) * y;
+		y *= gain;
 		
 		/*--- Delay ---*/
 		value = (int32_t)((32767.0f) * y);
@@ -275,6 +275,7 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 			value = 32767;
 		}
 
+		*outp++ = (int16_t)value;
 		*outp++ = (int16_t)value;
 
 		/*--- Delay write ---*/

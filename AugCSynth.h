@@ -7,4 +7,6 @@
 // Include
 // ============================================================================
 #include <Subtractive/SubParams.h>
+#include <Subtractive/SubWaveGen.h>
 #include <Parameters.h>
+#include <Voice.h>
