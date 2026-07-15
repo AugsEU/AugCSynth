@@ -9,13 +9,15 @@
 #include <math.h>
 #include <stdint.h>
 
+#include <Subtractive/SubParams.h>
+
 namespace AugCSynth
 {
 
 // ============================================================================
 // Public constant
 // ============================================================================
-constexpr size_t NUM_PARAMETERS = 40; // TO DO fix this?
+constexpr size_t NUM_PARAMETERS = ASP_NUM_PARAMS;
 
 // ============================================================================
 // Public types
