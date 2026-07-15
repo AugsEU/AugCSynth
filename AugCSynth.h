@@ -6,7 +6,10 @@
 // ============================================================================
 // Include
 // ============================================================================
-#include <Subtractive/SubParams.h>
-#include <Subtractive/SubWaveGen.h>
+
+#include <Config.h>
 #include <Parameters.h>
 #include <Voice.h>
+
+#include <Subtractive/SubParams.h>
+#include <Subtractive/SubWaveGen.h>

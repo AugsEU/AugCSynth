@@ -6,5 +6,10 @@
 // ============================================================================
 // Include
 // ============================================================================
+namespace AugCSynth
+{
+
 constexpr size_t SAMPLE_RATE = 41000ull;
 constexpr float SAMPLE_PERIOD = ((1.0f / (float)SAMPLE_RATE));
+
+}
