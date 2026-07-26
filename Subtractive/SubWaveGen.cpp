@@ -11,6 +11,7 @@
 #include <Filter/NLFilter.h>
 #include "Utilities/QwertyMath.h"
 #include <Config.h>
+#include <AugCState.h>
 
 
 namespace AugCSynth::Subtractive
@@ -23,24 +24,6 @@ namespace AugCSynth::Subtractive
 #define DELAY_GLITCH_SIZE 2000
 #define LOUDNESS_ALPHA (0.001f)
 
-#define CLICK_PHASE_INC (262.62f * SAMPLE_PERIOD)
-#define CLICK_VOLUME (500)
-
-
-
-
-// ============================================================================
-// Globals
-// ============================================================================
-static uint16_t gDelayBuffer[DELAY_BUFFER_LEN];
-static uint32_t gDelayWriteHead;
-static int32_t gDelayReadOffset = 0;
-static int32_t gDelayReadOffsetOffset = 0;
-
-static Oscillator gLFO;
-static Oscillator gLFOWobbler;
-static NLFilter gFilter;
-static float gCurrLoudness = 0.0f;
 
 // ============================================================================
 // Public functions
@@ -51,20 +34,26 @@ void SynthInit(void)
 {
 	for(int i = 0; i < VOICE_POLYPHONY; i++)
 	{
-		VoiceInit(&gVoices[i].mSubVoice);
+		VoiceInit(&State().mVoices[i].mSubVoice);
 	}
 
-	gDelayWriteHead = 0;
+	SubState& subState = State().mSubState;
+
+	subState.mDelayWriteHead = 0;
+	subState.mDelayReadOffset = 0;
+	subState.mDelayReadOffsetOffset = 0;
 	for(int i = 0; i < DELAY_BUFFER_LEN; i++)
 	{
-		gDelayBuffer[i] = 0;
+		subState.mDelayBuffer[i] = 0;
 	}
 
-	OscInit(&gLFO);
-	OscInit(&gLFOWobbler);
+	OscInit(&subState.mLFO);
+	OscInit(&subState.mLFOWobbler);
+
+	subState.mCurrLoudness = 0.0f;
 
 	ZeroOutParams();
-	gFilter = NLFilter();
+	subState.mFilter.Init();
 
 	// Default test preset
 	SetFloatParam(ASP_GAIN, 0.7f);
@@ -117,30 +106,32 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 
 	// Delay
 	uint32_t delayMode = GetIntParam(ASP_DELAY_MODE);
+
+	SubState& subState = State().mSubState;
 	
 	if(delayMode == DELAY_MODE_GLITCH)
 	{
 		if(rndValue % 13 == 0)
 		{
-			if(rndValue % 3 == 0 && gDelayReadOffsetOffset < DELAY_GLITCH_SIZE)
+			if(rndValue % 3 == 0 && subState.mDelayReadOffsetOffset < DELAY_GLITCH_SIZE)
 			{
-				gDelayReadOffsetOffset += DELAY_GLITCH_SIZE / 3;
+				subState.mDelayReadOffsetOffset += DELAY_GLITCH_SIZE / 3;
 			}
-			else if (rndValue % 3 == 1 && gDelayReadOffsetOffset > -DELAY_GLITCH_SIZE)
+			else if (rndValue % 3 == 1 && subState.mDelayReadOffsetOffset > -DELAY_GLITCH_SIZE)
 			{
-				gDelayReadOffsetOffset -= DELAY_GLITCH_SIZE / 3;
+				subState.mDelayReadOffsetOffset -= DELAY_GLITCH_SIZE / 3;
 			}
 		}
 	}
 	else
 	{
-		gDelayReadOffsetOffset = 0;
+		subState.mDelayReadOffsetOffset = 0;
 	}
 
-	int32_t delayReadOffset = GetFloatParam(ASP_DELAY_TIME) * DELAY_BUFFER_LEN + gDelayReadOffsetOffset;
+	int32_t delayReadOffset = GetFloatParam(ASP_DELAY_TIME) * DELAY_BUFFER_LEN + subState.mDelayReadOffsetOffset;
 	if(delayMode == DELAY_MODE_OFF)
 	{
-		gDelayReadOffset = 0;
+		subState.mDelayReadOffset = 0;
 		delayReadOffset = 0;
 	}
 	else
@@ -148,12 +139,12 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		if(delayReadOffset < 0) 
 		{
 			delayReadOffset = 0;
-			gDelayReadOffsetOffset = 0;
+			subState.mDelayReadOffsetOffset = 0;
 		}
 		else if(delayReadOffset >= DELAY_BUFFER_LEN)
 		{
 			delayReadOffset =  DELAY_BUFFER_LEN - 1;
-			gDelayReadOffsetOffset = 0;
+			subState.mDelayReadOffsetOffset = 0;
 		}
 	}
 	int32_t delayFeedbackVol = (uint32_t)(GetFloatParam(ASP_DELAY_FEEDBACK) * 32768.0f);
@@ -172,7 +163,7 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 	float shape2Lfo = GetFloatParam(ASP_LFO_OSC2_SHAPE);
 
 	// VCF
-	gFilter.SetFilterType(GetIntParam(ASP_VCF_MODE));
+	subState.mFilter.SetFilterType(GetIntParam(ASP_VCF_MODE));
 	float filterFreqMod, filterFreq = GetFloatParam(ASP_VCF_CUTOFF);
 	float filterRes = GetFloatParam(ASP_VCF_RES);
 	float filterFreqLfo = GetFloatParam(ASP_LFO_VCF_CUTOFF);
@@ -192,25 +183,25 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 
 	for(int i = 0; i < VOICE_POLYPHONY; i++)
 	{
-		VoicePrepSampleBlock(&gVoices[i].mSubVoice);
+		VoicePrepSampleBlock(&State().mVoices[i].mSubVoice);
 	}
 
 	for (pos = 0; pos < samples; pos++)
 	{		
 		/*--- LFO ---*/
-		OscPhaseInc(&gLFO, lfoPhaseInc * ComputeLfoMult(SineQuadraic(gLFOWobbler.mPhase), lfoWobble));
-		OscPhaseInc(&gLFOWobbler, lfoWobblePhaseInc);
+		OscPhaseInc(&subState.mLFO, lfoPhaseInc * ComputeLfoMult(SineQuadraic(subState.mLFOWobbler.mPhase), lfoWobble));
+		OscPhaseInc(&subState.mLFOWobbler, lfoWobblePhaseInc);
 		switch (lfoWaveSelect)
 		{
 		default:
 		case OSC_MODE_SINE:
-			lfoValue = SineQuadraic(gLFO.mPhase);
+			lfoValue = SineQuadraic(subState.mLFO.mPhase);
 			break;
 		case OSC_MODE_SQUARE:
-			lfoValue = SquareWaveLFO(gLFO.mPhase);
+			lfoValue = SquareWaveLFO(subState.mLFO.mPhase);
 			break;
 		case OSC_MODE_SAW:
-			lfoValue = SawWaveBLEP(gLFO.mPhase, lfoPhaseInc);
+			lfoValue = SawWaveBLEP(subState.mLFO.mPhase, lfoPhaseInc);
 			break;
 		}
 
@@ -221,21 +212,21 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 
 		for(int i = 0; i < VOICE_POLYPHONY; i++)
 		{
-			y += VoiceGetSample(&gVoices[i].mSubVoice, waveType1, waveType2, tune1, tune2, shape1, shape2, lfoValue);
+			y += VoiceGetSample(&State().mVoices[i].mSubVoice, waveType1, waveType2, tune1, tune2, shape1, shape2, lfoValue);
 		}
 
 		/*--- Measure loudness ---*/
 		float sampLoud = fabsf(y) * 6.0f;
 		if(sampLoud > 1.0f) sampLoud = 1.0f;
-		gCurrLoudness = LOUDNESS_ALPHA * sampLoud + (1.0f - LOUDNESS_ALPHA) * gCurrLoudness;
+		subState.mCurrLoudness = LOUDNESS_ALPHA * sampLoud + (1.0f - LOUDNESS_ALPHA) * subState.mCurrLoudness;
 
 		/*--- Filter ---*/
 		y *= (1.0f / (VOICE_POLYPHONY + 1.0f)); // Normalise
 		filterFreqMod = ComputeLfoMult(lfoValue, filterFreqLfo);
-		filterFreqMod *=  ComputeLoudnessMult(gCurrLoudness, filterFollow);
-		gFilter.SetFilterFreq(filterFreq * filterFreqMod);
-		gFilter.SetFilterRes(filterRes * ComputeLfoMult(lfoValue, filterResLfo));
-		y = gFilter.NextSample(y);
+		filterFreqMod *=  ComputeLoudnessMult(subState.mCurrLoudness, filterFollow);
+		subState.mFilter.SetFilterFreq(filterFreq * filterFreqMod);
+		subState.mFilter.SetFilterRes(filterRes * ComputeLfoMult(lfoValue, filterResLfo));
+		y = subState.mFilter.NextSample(y);
 
 		/*--- Drive & Gain ---*/
 		y = drive * DrivenSample(y) + (1.0f - drive) * y;
@@ -247,21 +238,21 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		// Delay read
 		if ((pos % delayGlide) == 0)
 		{
-			if(gDelayReadOffset < delayReadOffset)
+			if(subState.mDelayReadOffset < delayReadOffset)
 			{
-				gDelayReadOffset += 1;
+				subState.mDelayReadOffset += 1;
 			}
-			else if (gDelayReadOffset > delayReadOffset)
+			else if (subState.mDelayReadOffset > delayReadOffset)
 			{
-				gDelayReadOffset -= 1;
+				subState.mDelayReadOffset -= 1;
 			}
 		}
 
 		noDelayValue = value;
-		if(gDelayReadOffset > 0)
+		if(subState.mDelayReadOffset > 0)
 		{
-			delayReadHead = (gDelayWriteHead + DELAY_BUFFER_LEN - gDelayReadOffset) % DELAY_BUFFER_LEN;
-			delayValue = (int16_t)gDelayBuffer[delayReadHead];
+			delayReadHead = (subState.mDelayWriteHead + DELAY_BUFFER_LEN - subState.mDelayReadOffset) % DELAY_BUFFER_LEN;
+			delayValue = (int16_t)subState.mDelayBuffer[delayReadHead];
 			value += delayValue;
 		}
 
@@ -287,8 +278,8 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		value *= delayFeedbackVol;
 		value /= 32768;
 
-		gDelayBuffer[gDelayWriteHead] = (uint16_t)(int16_t)value;
-		gDelayWriteHead = (gDelayWriteHead + 1) % DELAY_BUFFER_LEN;
+		subState.mDelayBuffer[subState.mDelayWriteHead] = (uint16_t)(int16_t)value;
+		subState.mDelayWriteHead = (subState.mDelayWriteHead + 1) % DELAY_BUFFER_LEN;
 	}
 }
 

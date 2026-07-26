@@ -19,7 +19,7 @@ namespace AugCSynth
 class NLFilter
 {
 public:
-	NLFilter();
+	void Init();
 	void SetFilterFreq(float val);
 	void SetFilterRes(float val);
 	void SetFilterType(uint8_t type);

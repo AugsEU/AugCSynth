@@ -20,8 +20,7 @@ namespace AugCSynth
 // ============================================================================
 // Globals
 // ============================================================================
-SynthParameter gParameters[NUM_PARAMETERS];
-SynthMode gMode;
+
 
 // ============================================================================
 // Public functions
@@ -29,37 +28,37 @@ SynthMode gMode;
 
 void ZeroOutParams()
 {
-	memset(gParameters, 0x00, sizeof(gParameters));
+	memset(State().mParameters, 0x00, sizeof(State().mParameters));
 }
 
 float GetFloatParam(size_t idx)
 {
-	return gParameters[idx].mFloatValue;
+	return State().mParameters[idx].mFloatValue;
 }
 
 void SetFloatParam(size_t idx, float param)
 {
-	gParameters[idx].mFloatValue = param;
+	State().mParameters[idx].mFloatValue = param;
 }
 
 uint32_t GetIntParam(size_t idx)
 {
-	return gParameters[idx].mIntValue;
+	return State().mParameters[idx].mIntValue;
 }
 
 void SetIntParam(size_t idx, uint32_t param)
 {
-	gParameters[idx].mIntValue = param;
+	State().mParameters[idx].mIntValue = param;
 }
 
 SynthMode GetSynthMode()
 {
-	return gMode;
+	return State().mMode;
 }
 
 void SetSynthMode(SynthMode mode)
 {
-	gMode = mode;
+	State().mMode = mode;
 }
 
 } //namespace AugCSynth

@@ -20,7 +20,6 @@ namespace AugCSynth
 // ============================================================================
 
 constexpr uint8_t INVALID_NOTE = 0xFF;
-constexpr uint8_t VOICE_POLYPHONY = 4;
 
 
 
@@ -32,7 +31,7 @@ constexpr uint8_t VOICE_POLYPHONY = 4;
 
 struct Voice
 {
-    uint8_t mNoteNum = INVALID_NOTE;
+    uint8_t mNoteNum;
     
     union
     {
@@ -44,22 +43,11 @@ struct Voice
 
 
 
-
-
 // ============================================================================
 // Public functions
 // ============================================================================
 void BeginVoice(uint8_t note);
 void ReleaseVoice(uint8_t note);
 void StopVoice(uint8_t note);
-
-
-
-
-
-// ============================================================================
-// Public globals
-// ============================================================================
-extern Voice gVoices[VOICE_POLYPHONY];
 
 } // namespace AugCSynth

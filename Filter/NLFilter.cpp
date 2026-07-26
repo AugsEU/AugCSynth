@@ -33,7 +33,7 @@ float LowpassClip(float n);
 // Public functions
 // ============================================================================
 
-NLFilter::NLFilter()
+void NLFilter::Init()
 {
 	mType = FILTER_MODE_OFF;
 	mSample0 = 0;

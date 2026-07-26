@@ -1,32 +1,35 @@
 // ============================================================================
-// Synth parameters
+// Non-linear filter for subtractive synth
 // ----------------------------------------------------------------------------
 #pragma once
 #include <pch.h>
 // ============================================================================
 // Includes
 // ============================================================================
-#include <math.h>
-#include <stdint.h>
+#include "Oscillator.h"
+#include <Filter/NLFilter.h>
 
-#include "AugCState.h"
+// ============================================================================
+// Constants
+// ============================================================================
+#define DELAY_BUFFER_LEN 48000
+#define DELAY_GLITCH_SIZE 2000
+#define LOUDNESS_ALPHA (0.001f)
 
-namespace AugCSynth
+namespace AugCSynth::Subtractive
 {
 
-// ============================================================================
-// Public functions
-// ============================================================================
+struct SubState
+{
+	uint16_t mDelayBuffer[DELAY_BUFFER_LEN];
+	uint32_t mDelayWriteHead;
+	int32_t mDelayReadOffset;
+	int32_t mDelayReadOffsetOffset;
 
-void ZeroOutParams();
+	Oscillator mLFO;
+	Oscillator mLFOWobbler;
+	NLFilter mFilter;
+	float mCurrLoudness;
+};
 
-float GetFloatParam(size_t idx);
-void SetFloatParam(size_t idx, float param);
-
-uint32_t GetIntParam(size_t idx);
-void SetIntParam(size_t idx, uint32_t param);
-
-SynthMode GetSynthMode();
-void SetSynthMode(SynthMode mode);
-
-} // namespace AugCSynth
+}

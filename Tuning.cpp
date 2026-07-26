@@ -2,6 +2,7 @@
 // Includes
 // ============================================================================
 #include "Tuning.h"
+#include "AugCState.h"
 
 namespace AugCSynth
 {
@@ -199,8 +200,64 @@ constexpr float TwentyFourTET[24] =
     119.9558505931239409f, 123.4708253139750411f, 127.0887966558923949f,
 };
 
+// ============================================================================
+// Public functions
+// ============================================================================
 
-const float* gLoadedTable = TwelveTET;
+void SetTuning(Tuning tuning)
+{
+    switch (tuning)
+    {
+	case Tuning::Equal12:
+        State().mTuningTable = TwelveTET;
+		break;
+	case Tuning::Equal24: 
+        State().mTuningTable = TwentyFourTET;
+		break;
+	case Tuning::JustC:
+        State().mTuningTable = CnJI;
+		break;
+	case Tuning::JustCs:
+        State().mTuningTable = CsJI;
+		break;
+	case Tuning::JustD:
+        State().mTuningTable = DnJI;
+		break;
+	case Tuning::JustDs:
+        State().mTuningTable = DsJI;
+		break;
+	case Tuning::JustE:
+        State().mTuningTable = EnJI;
+		break;
+	case Tuning::JustF:
+        State().mTuningTable = FnJI;
+		break;
+	case Tuning::JustFs:
+        State().mTuningTable = FsJI;
+		break;
+	case Tuning::JustG:
+        State().mTuningTable = GnJI;
+		break;
+	case Tuning::JustGs:
+        State().mTuningTable = GsJI;
+		break;
+	case Tuning::JustA:
+        State().mTuningTable = AnJI;
+		break;
+	case Tuning::JustAs:
+        State().mTuningTable = AsJI;
+		break;
+	case Tuning::JustB:
+        State().mTuningTable = BnJI;
+		break;
+	case Tuning::CircleOfFifths:
+        State().mTuningTable = CircleOfFive;
+		break;
+	case Tuning::Wonky:
+        State().mTuningTable = Wonky;
+        break;
+    }
+}
 
 /// @brief Convert note index to frequency.
 float NoteToFreq(uint8_t note)
@@ -212,7 +269,7 @@ float NoteToFreq(uint8_t note)
         note -= 24;
     }
 
-    float freq = gLoadedTable[note];
+    float freq = State().mTuningTable[note];
 
     while (octave > 0)
     {

@@ -5,27 +5,11 @@
 #include <Tuning.h>
 #include <Config.h>
 #include <algorithm>
+#include <AugCState.h>
+
 
 namespace AugCSynth
 {
-
-// ============================================================================
-// Globals
-// ============================================================================
-Voice gVoices[VOICE_POLYPHONY];
-uint8_t gFreeNoteSearchStart = 0;
-
-
-
-
-// ============================================================================
-// Forward decl
-// ============================================================================
-
-
-
-
-
 // ============================================================================
 // Voice
 // ============================================================================
@@ -49,9 +33,9 @@ void BeginVoice(uint8_t note)
     uint8_t bestVoiceIdx = 0xFF;
     float bestVoiceValue = 0.0f;
 
-    for(uint8_t i = gFreeNoteSearchStart; i < VOICE_POLYPHONY; i++)
+    for(uint8_t i = State().mFreeNoteSearchStart; i < VOICE_POLYPHONY; i++)
     {
-        Voice& newVoice = gVoices[i];
+        Voice& newVoice = State().mVoices[i];
         float currVoiceValue = Subtractive::VoiceEligibility(&newVoice.mSubVoice, note);
         if(currVoiceValue > bestVoiceValue)
         {
@@ -67,8 +51,8 @@ void BeginVoice(uint8_t note)
 
     if(bestVoiceIdx != 0xFF)
     {
-        Subtractive::VoiceOn(&gVoices[bestVoiceIdx].mSubVoice, note);
-        gVoices[bestVoiceIdx].mNoteNum = note;
+        Subtractive::VoiceOn(&State().mVoices[bestVoiceIdx].mSubVoice, note);
+        State().mVoices[bestVoiceIdx].mNoteNum = note;
     }
 }
 
@@ -79,10 +63,10 @@ void ReleaseVoice(uint8_t note)
 
     for(uint8_t i = 0; i < VOICE_POLYPHONY; i++)
     {
-        if(gVoices[i].mNoteNum == note)
+        if(State().mVoices[i].mNoteNum == note)
         {
-            Subtractive::VoiceOff(&gVoices[i].mSubVoice);
-            gFreeNoteSearchStart = std::min(i, gFreeNoteSearchStart);
+            Subtractive::VoiceOff(&State().mVoices[i].mSubVoice);
+            State().mFreeNoteSearchStart = std::min(i, State().mFreeNoteSearchStart);
             return;
         }       
     }
@@ -95,12 +79,12 @@ void StopVoice(uint8_t note)
 
     for(uint8_t i = 0; i < VOICE_POLYPHONY; i++)
     {
-        if(gVoices[i].mNoteNum == note)
+        if(State().mVoices[i].mNoteNum == note)
         {
             // ToDo Stop correctly
-            Subtractive::VoiceOff(&gVoices[i].mSubVoice);
-            gVoices[i].mNoteNum = INVALID_NOTE;
-            gFreeNoteSearchStart = std::min(i, gFreeNoteSearchStart);
+            Subtractive::VoiceOff(&State().mVoices[i].mSubVoice);
+            State().mVoices[i].mNoteNum = INVALID_NOTE;
+            State().mFreeNoteSearchStart = std::min(i, State().mFreeNoteSearchStart);
             return;
         }       
     }
