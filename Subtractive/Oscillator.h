@@ -20,14 +20,11 @@ namespace AugCSynth::Subtractive
 // ============================================================================
 struct Oscillator
 {
+	void Init();
+	void PhaseInc(float phaseInc);
+
 	float 	mPhase;	// Radians
 };
-
-// ============================================================================
-// Public functions
-// ============================================================================
-void OscInit(Oscillator* osc);
-void OscPhaseInc(Oscillator* osc, float phaseInc);
 
 }
 

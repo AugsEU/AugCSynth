@@ -29,6 +29,9 @@ enum EnvelopeSection
 
 struct Envelope
 {
+    void Init();
+    void NextSample();
+
     EnvelopeSection mSection;
     float mAttack;
     float mDecay;
@@ -37,12 +40,5 @@ struct Envelope
     
     float mVolume;
 };
-
-// ============================================================================
-// Public functions
-// ============================================================================
-
-void EnvInit(Envelope* pEnv);
-void EnvNextSample(Envelope* pEnv);
     
 }

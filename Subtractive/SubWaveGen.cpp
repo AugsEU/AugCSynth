@@ -34,7 +34,7 @@ void SynthInit(void)
 {
 	for(int i = 0; i < VOICE_POLYPHONY; i++)
 	{
-		VoiceInit(&State().mVoices[i].mSubVoice);
+		State().mVoices[i].mSubVoice.Init();
 	}
 
 	SubState& subState = State().mSubState;
@@ -47,8 +47,8 @@ void SynthInit(void)
 		subState.mDelayBuffer[i] = 0;
 	}
 
-	OscInit(&subState.mLFO);
-	OscInit(&subState.mLFOWobbler);
+	subState.mLFO.Init();
+	subState.mLFOWobbler.Init();
 
 	subState.mCurrLoudness = 0.0f;
 
@@ -183,14 +183,14 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 
 	for(int i = 0; i < VOICE_POLYPHONY; i++)
 	{
-		VoicePrepSampleBlock(&State().mVoices[i].mSubVoice);
+		State().mVoices[i].mSubVoice.PrepSampleBlock();
 	}
 
 	for (pos = 0; pos < samples; pos++)
 	{		
 		/*--- LFO ---*/
-		OscPhaseInc(&subState.mLFO, lfoPhaseInc * ComputeLfoMult(SineQuadraic(subState.mLFOWobbler.mPhase), lfoWobble));
-		OscPhaseInc(&subState.mLFOWobbler, lfoWobblePhaseInc);
+		subState.mLFO.PhaseInc(lfoPhaseInc * ComputeLfoMult(SineQuadraic(subState.mLFOWobbler.mPhase), lfoWobble));
+		subState.mLFOWobbler.PhaseInc(lfoWobblePhaseInc);
 		switch (lfoWaveSelect)
 		{
 		default:
@@ -212,7 +212,11 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 
 		for(int i = 0; i < VOICE_POLYPHONY; i++)
 		{
-			y += VoiceGetSample(&State().mVoices[i].mSubVoice, waveType1, waveType2, tune1, tune2, shape1, shape2, lfoValue);
+			y += State().mVoices[i].mSubVoice.GetSample(
+					waveType1, waveType2, 
+					tune1, tune2, 
+					shape1, shape2, 
+					lfoValue);
 		}
 
 		/*--- Measure loudness ---*/

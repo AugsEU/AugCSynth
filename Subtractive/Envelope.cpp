@@ -11,60 +11,60 @@ namespace AugCSynth::Subtractive
 // ============================================================================
 // Public functions
 // ============================================================================
-void EnvInit(Envelope* pEnv)
+void Envelope::Init()
 {
-    pEnv->mSection = ES_OFF; 
-    pEnv->mAttack = 0.01f;
-    pEnv->mSustain = 0.95f;
-    pEnv->mDecay = 0.01f;
-    pEnv->mRelease = 0.01f;
-    pEnv->mVolume = 0.0f;
+    mSection = ES_OFF; 
+    mAttack = 0.01f;
+    mSustain = 0.95f;
+    mDecay = 0.01f;
+    mRelease = 0.01f;
+    mVolume = 0.0f;
 }
 
-void EnvNextSample(Envelope* pEnv)
+void Envelope::NextSample()
 {
-    EnvelopeSection section = pEnv->mSection;
+    EnvelopeSection section = mSection;
 
     switch (section)
     {
     case ES_OFF:
         break;
     case ES_ATTACK:
-        pEnv->mVolume += pEnv->mAttack;
-        if(pEnv->mVolume >= 1.0f)
+        mVolume += mAttack;
+        if(mVolume >= 1.0f)
         {
-            pEnv->mVolume = 1.0f;
-            pEnv->mSection = ES_DECAY;
+            mVolume = 1.0f;
+            mSection = ES_DECAY;
         }
         break;
     case ES_DECAY:
-        pEnv->mVolume -= pEnv->mDecay;
-        if(pEnv->mVolume <= pEnv->mSustain)
+        mVolume -= mDecay;
+        if(mVolume <= mSustain)
         {
-            pEnv->mVolume = pEnv->mSustain;
+            mVolume = mSustain;
             uint32_t soundType = GetIntParam(ASP_SOUND_TYPE);
             if(soundType == SOUND_TYPE_POLY || soundType == SOUND_TYPE_MONO)
             {
-                pEnv->mSection = ES_SUSTAIN;
+                mSection = ES_SUSTAIN;
             }
             else
             {
-                pEnv->mSection = ES_RELEASE;
+                mSection = ES_RELEASE;
             }
         }
         break;
     case ES_SUSTAIN:
-        if(pEnv->mSustain == 0.0f)
+        if(mSustain == 0.0f)
         {
-            pEnv->mSection = ES_OFF;
+            mSection = ES_OFF;
         }
         break; // Something else has to set this release.
     case ES_RELEASE:
-        pEnv->mVolume -= pEnv->mRelease;
-        if(signbit(pEnv->mVolume))
+        mVolume -= mRelease;
+        if(signbit(mVolume))
         {
-            pEnv->mVolume = 0.0f;
-            pEnv->mSection = ES_OFF;
+            mVolume = 0.0f;
+            mSection = ES_OFF;
         }
         break;
     }

@@ -12,21 +12,21 @@ namespace AugCSynth::Subtractive
 // ============================================================================
 
 /// @brief Initialise an oscillator 
-void OscInit(Oscillator* osc)
+void Oscillator::Init()
 {
-    osc->mPhase = 0.0f;
+    mPhase = 0.0f;
 }
 
 
 
 /// @brief Increment phase of oscillator by 1 sample.
-void OscPhaseInc(Oscillator* osc, float phaseInc)
+void Oscillator::PhaseInc(float phaseInc)
 {
-    osc->mPhase += phaseInc;
+    mPhase += phaseInc;
 
-	if (osc->mPhase >= 1.0f)
+	if (mPhase >= 1.0f)
     {
-		osc->mPhase -= 1.0f;
+		mPhase -= 1.0f;
     }
 }
 

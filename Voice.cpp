@@ -36,7 +36,8 @@ void BeginVoice(uint8_t note)
     for(uint8_t i = State().mFreeNoteSearchStart; i < VOICE_POLYPHONY; i++)
     {
         Voice& newVoice = State().mVoices[i];
-        float currVoiceValue = Subtractive::VoiceEligibility(&newVoice.mSubVoice, note);
+        // To do: fix this
+        float currVoiceValue = newVoice.mSubVoice.Eligibility(note);
         if(currVoiceValue > bestVoiceValue)
         {
             bestVoiceIdx = i;
@@ -51,7 +52,8 @@ void BeginVoice(uint8_t note)
 
     if(bestVoiceIdx != 0xFF)
     {
-        Subtractive::VoiceOn(&State().mVoices[bestVoiceIdx].mSubVoice, note);
+        // To do: Fix this
+        State().mVoices[bestVoiceIdx].mSubVoice.VoiceOn(note);
         State().mVoices[bestVoiceIdx].mNoteNum = note;
     }
 }
@@ -65,7 +67,8 @@ void ReleaseVoice(uint8_t note)
     {
         if(State().mVoices[i].mNoteNum == note)
         {
-            Subtractive::VoiceOff(&State().mVoices[i].mSubVoice);
+            // To do: Fix this
+            State().mVoices[i].mSubVoice.VoiceOff();
             State().mFreeNoteSearchStart = std::min(i, State().mFreeNoteSearchStart);
             return;
         }       
@@ -82,7 +85,7 @@ void StopVoice(uint8_t note)
         if(State().mVoices[i].mNoteNum == note)
         {
             // ToDo Stop correctly
-            Subtractive::VoiceOff(&State().mVoices[i].mSubVoice);
+            State().mVoices[i].mSubVoice.VoiceOff();
             State().mVoices[i].mNoteNum = INVALID_NOTE;
             State().mFreeNoteSearchStart = std::min(i, State().mFreeNoteSearchStart);
             return;
