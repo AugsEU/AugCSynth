@@ -100,65 +100,29 @@ float SubVoice::GetSample(
     }
     lfoValue *= mLfoAmount;
 
-    float osc1TuneLFO = FastUnitExp(GetFloatParam(ASP_LFO_OSC1_TUNE) * lfoValue);
-    float osc2TuneLFO = FastUnitExp(GetFloatParam(ASP_LFO_OSC2_TUNE) * lfoValue);
-    float dt = mFreq;
+    const float osc1TuneLFO = FastUnitExp(GetFloatParam(ASP_LFO_OSC1_TUNE) * lfoValue);
+    const float osc2TuneLFO = FastUnitExp(GetFloatParam(ASP_LFO_OSC2_TUNE) * lfoValue);
+    const float dt = mFreq;
 
     // Osc1
     mOsc1.PhaseInc(dt * tune1 * osc1TuneLFO);
-    float osc1;
-    switch (waveType1)
-    {
-    default:
-    case OSC_MODE_SINE:
-        osc1 = SineQuadraic(mOsc1.mPhase);
-        osc1 = ShapeWave(osc1, shape1);
-        break;
-    case OSC_MODE_SQUARE:
-        osc1 = SquareWaveBLEPShape(mOsc1.mPhase, dt, shape1);
-        break;
-    case OSC_MODE_SAW:
-        osc1 = SawWaveBLEP(mOsc1.mPhase, dt);
-        osc1 = ShapeWave(osc1, shape1);
-        break;
-    case OSC_MODE_ORGAN:
-        osc1 = SquareWaveOrgan(mOsc1.mPhase, shape1);
-        break;
-    }
+    float osc1 = GetWaveSample(mOsc1.mPhase, dt, (WaveType)waveType1, shape1);
     osc1 *= GetFloatParam(ASP_DCO_VOL_1);
 
     mEnv1.NextSample();
-    osc1TuneLFO = mEnv1.mVolume;// reuse var
-    osc1 *= osc1TuneLFO * osc1TuneLFO;
+    const float env1Volume = mEnv1.mVolume;
+    osc1 *= env1Volume * env1Volume;
     osc1 *= ComputeLfoMult(lfoValue, GetFloatParam(ASP_LFO_OSC1_VOLUME));
 
 #if !MONO_OSC
     // Osc2
     mOsc2.PhaseInc(dt * tune2 * osc2TuneLFO);
-    float osc2;
-    switch (waveType2)
-    {
-    default:
-    case OSC_MODE_SINE:
-        osc2 = SineQuadraic(mOsc2.mPhase);
-        osc2 = ShapeWave(osc2, shape2);
-        break;
-    case OSC_MODE_SQUARE:
-        osc2 = SquareWaveBLEPShape(mOsc2.mPhase, dt, shape2);
-        break;
-    case OSC_MODE_SAW:
-        osc2 = SawWaveBLEP(mOsc2.mPhase, dt);
-        osc2 = ShapeWave(osc2, shape2);
-        break;
-    case OSC_MODE_ORGAN:
-        osc2= SquareWaveOrgan(mOsc2.mPhase, shape1);
-        break;
-    }
+    float osc2 = GetWaveSample(mOsc2.mPhase, dt, (WaveType)waveType2, shape2);
     osc2 *= GetFloatParam(ASP_DCO_VOL_2);
 
     mEnv2.NextSample();
-    osc2TuneLFO = mEnv2.mVolume;// reuse var
-    osc2 *= osc2TuneLFO * osc2TuneLFO;
+    const float env2Volume = mEnv2.mVolume;
+    osc2 *= env2Volume * env2Volume;
     osc2 *= ComputeLfoMult(lfoValue, GetFloatParam(ASP_LFO_OSC2_VOLUME));
 
     return osc1 + osc2;

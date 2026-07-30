@@ -2,7 +2,7 @@
 // Includes
 // ============================================================================
 #include "Oscillator.h"
-
+#include "Subtractive/SubParams.h"
 
 namespace AugCSynth::Subtractive
 {

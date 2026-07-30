@@ -57,12 +57,12 @@ void SynthInit(void)
 
 	// Default test preset
 	SetFloatParam(ASP_GAIN, 0.7f);
-	SetIntParam(ASP_DCO_WAVE_TYPE_1, OSC_MODE_SAW);
+	SetIntParam(ASP_DCO_WAVE_TYPE_1, (int)WaveType::Saw);
 	SetFloatParam(ASP_DCO_TUNE_1, 1.0f);
 	SetFloatParam(ASP_DCO_VOL_1, 0.75f);
 	SetFloatParam(ASP_DCO_WS_1, 0.5f);
 
-	SetIntParam(ASP_DCO_WAVE_TYPE_2, OSC_MODE_SQUARE);
+	SetIntParam(ASP_DCO_WAVE_TYPE_2, (int)WaveType::Square);
 	SetFloatParam(ASP_DCO_TUNE_2, 1.5f);
 	SetFloatParam(ASP_DCO_VOL_2, 0.8f);
 	SetFloatParam(ASP_DCO_WS_2, 0.2f);
@@ -172,7 +172,7 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 
 	// LFO
 	float lfoValue;
-	uint32_t lfoWaveSelect = GetIntParam(ASP_LFO_WAVE_TYPE);
+	WaveType lfoWaveSelect = (WaveType)GetIntParam(ASP_LFO_WAVE_TYPE);
 	float lfoPhaseInc = GetFloatParam(ASP_LFO_RATE);
 	float lfoWobblePhaseInc = lfoPhaseInc * 0.061804697157f;
 	float lfoWobble = GetFloatParam(ASP_LFO_WOBBLE);
@@ -191,19 +191,7 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		/*--- LFO ---*/
 		subState.mLFO.PhaseInc(lfoPhaseInc * ComputeLfoMult(SineQuadraic(subState.mLFOWobbler.mPhase), lfoWobble));
 		subState.mLFOWobbler.PhaseInc(lfoWobblePhaseInc);
-		switch (lfoWaveSelect)
-		{
-		default:
-		case OSC_MODE_SINE:
-			lfoValue = SineQuadraic(subState.mLFO.mPhase);
-			break;
-		case OSC_MODE_SQUARE:
-			lfoValue = SquareWaveLFO(subState.mLFO.mPhase);
-			break;
-		case OSC_MODE_SAW:
-			lfoValue = SawWaveBLEP(subState.mLFO.mPhase, lfoPhaseInc);
-			break;
-		}
+		lfoValue = GetWaveLFO(subState.mLFO.mPhase, (WaveType)lfoWaveSelect);
 
 		/*--- Generate waveform ---*/
 		float	y = 0.0f;

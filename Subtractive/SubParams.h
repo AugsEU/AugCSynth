@@ -70,14 +70,6 @@
 #define DELAY_MODE_GLITCH       3
 #define NUM_DELAY_MODES         4
 
-// Oscillator modes
-#define OSC_MODE_SINE           0
-#define OSC_MODE_SQUARE         1
-#define OSC_MODE_SAW            2
-#define OSC_MODE_ORGAN          3 
-#define NUM_OSC_MODES           4
-#define NUM_LFO_OSC_MODES       3
-
 // Filter modes
 #define FILTER_MODE_OFF         0
 #define FILTER_MODE_LP          1
