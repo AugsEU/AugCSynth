@@ -153,8 +153,8 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 	uint32_t delayReadHead;
 
 	// DCO
-	uint32_t waveType1 = GetIntParam(ASP_DCO_WAVE_TYPE_1);
-	uint32_t waveType2 = GetIntParam(ASP_DCO_WAVE_TYPE_2);
+	WaveType waveType1 = (WaveType)GetIntParam(ASP_DCO_WAVE_TYPE_1);
+	WaveType waveType2 = (WaveType)GetIntParam(ASP_DCO_WAVE_TYPE_2);
 	float tune1 = GetFloatParam(ASP_DCO_TUNE_1);
 	float tune2 = GetFloatParam(ASP_DCO_TUNE_2);
 	float shape1;// = 1.5f * GetFloatParam(ASP_DCO_WS_1) - 0.25f;

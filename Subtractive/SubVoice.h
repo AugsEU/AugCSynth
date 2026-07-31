@@ -22,6 +22,17 @@ namespace AugCSynth::Subtractive
 // ============================================================================
 struct SubVoice
 {
+private:
+    struct VoiceComponent
+    {
+        Oscillator mOsc;
+        Envelope mEnv;
+
+        void Init() { mOsc.Init(); mEnv.Init(); }
+        float DoNextSample(float phaseInc, WaveType waveType, float waveShape);
+    };
+
+public:
     void Init();
     void VoiceOn(uint8_t note);
     void VoiceOnSteal(uint8_t note);
@@ -29,7 +40,7 @@ struct SubVoice
 
     void PrepSampleBlock();
     float GetSample(
-        uint32_t waveShape1, uint32_t waveShape2,
+        WaveType waveShape1, WaveType waveShape2,
         float tune1, float tune2,
         float shape1, float shape2,
         float lfoValue);
@@ -39,11 +50,8 @@ struct SubVoice
     float mFreq; // Note: Oscillator frequency may vary from this.
     uint8_t mPlayingNoteIdx;
 
-    Oscillator mOsc1;
-    Envelope mEnv1;
-
-    Oscillator mOsc2;
-    Envelope mEnv2;
+    VoiceComponent mComp1;
+    VoiceComponent mComp2;
 
     float mLfoDelta;
     float mLfoAmount;

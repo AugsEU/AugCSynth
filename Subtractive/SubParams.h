@@ -76,23 +76,4 @@
 #define FILTER_MODE_HP          2
 #define NUM_FILTER_MODES        3
 
-// Tuning modes
-#define TUNING_12TET            0
-#define TUNING_Cn_JI            1
-#define TUNING_Cs_JI            2
-#define TUNING_Dn_JI            3
-#define TUNING_Ds_JI            4
-#define TUNING_En_JI            5
-#define TUNING_Fn_JI            6
-#define TUNING_Fs_JI            7
-#define TUNING_Gn_JI            8
-#define TUNING_Gs_JI            9
-#define TUNING_An_JI            10
-#define TUNING_As_JI            11
-#define TUNING_Bn_JI            12
-#define TUNING_24TET            13
-#define CIRCLE_OF_5             14
-#define WONKY                   15
-#define NUM_TUNINGS             16
-
 #endif // SUB_SYNTH_PARAMS_H
