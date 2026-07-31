@@ -7,7 +7,7 @@
 // Includes
 // ============================================================================
 #include <stdint.h>
-
+#include "Filter.h"
 
 
 namespace AugCSynth
@@ -22,12 +22,12 @@ public:
 	void Init();
 	void SetFilterFreq(float val);
 	void SetFilterRes(float val);
-	void SetFilterType(uint8_t type);
+	void SetFilterType(FilterMode type);
 
 	float NextSample(float smpl);
 
 private:
-	uint8_t 	mType;
+	FilterMode 	mType;
 	float	    mFreq;
 	float		mGain;
 	float		mQ;

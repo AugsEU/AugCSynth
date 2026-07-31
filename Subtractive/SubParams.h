@@ -1,79 +1,81 @@
-#ifndef SUB_SYNTH_PARAMS_H
-#define SUB_SYNTH_PARAMS_H
+// ============================================================================
+// Voice for subtractive synth
+// ----------------------------------------------------------------------------
+#pragma once
+#include <pch.h>
+// ============================================================================
+// Types
+// ============================================================================
 
-// General
-#define ASP_TUNING              0 // Int param
-#define ASP_DRIVE               1 // 1.0f + GetFloatParam(ASP_DRIVE) * (DRIVE_ALPHA-1.0f);
-#define ASP_GAIN                2 // (2.0f / (float)MIDI_POLYPHONY) * GetFloatParam(ASP_GAIN);
+namespace AugCSynth::Subtractive {
 
-// Delay
-#define ASP_DELAY_TIME          3 // GetFloatParam(ASP_DELAY_TIME) * DELAY_BUFFER_LEN
-#define ASP_DELAY_FEEDBACK      4 // (uint32_t)(GetFloatParam(ASP_DELAY_FEEDBACK) * 32768.0f);
-#define ASP_DELAY_SHEAR         5 // (uint16_t)(GetFloatParam(ASP_DELAY_SHEAR) * (float)AUDIO_BUFF_LEN_DIV4) + 2;
-#define ASP_DELAY_MODE          6 // Int Param
-
-// DCO
-#define ASP_DCO_WAVE_TYPE_1     7  // Int param
-#define ASP_DCO_TUNE_1          8  // powf(2, floorf(4.0f * GetFloatParam(ASP_DCO_TUNE_1) - 1.5f));
-#define ASP_DCO_VOL_1           9  // x*x
-#define ASP_DCO_WS_1            10 // 0.5f to 0.95f 
-#define ASP_DCO_WAVE_TYPE_2     11 // Int param
-#define ASP_DCO_TUNE_2          12 // powf(2, floorf(4.0f * GetFloatParam(ASP_DCO_TUNE_2) - 1.5f));
-#define ASP_DCO_VOL_2           13 // x*x
-#define ASP_DCO_WS_2            14 // 0.5f to 0.95f 
-
-// ENV
-#define ASP_ENV_ATTACK1         15 // 1.0f / (SAMPLE_RATE * (8.01f - 8.0f * n));
-#define ASP_ENV_DECAY1          16 // 1.0f / (SAMPLE_RATE * (8.01f - 8.0f * n));
-#define ASP_ENV_SUSTAIN1        17 // 0 to 1
-#define ASP_ENV_RELEASE1        18 // 1.0f / (SAMPLE_RATE * (8.01f - 8.0f * n));
-#define ASP_ENV_ATTACK2         19 // 1.0f / (SAMPLE_RATE * (8.01f - 8.0f * n));
-#define ASP_ENV_DECAY2          20 // 1.0f / (SAMPLE_RATE * (8.01f - 8.0f * n));
-#define ASP_ENV_SUSTAIN2        21 // 0 to 1
-#define ASP_ENV_RELEASE2        22 // 1.0f / (SAMPLE_RATE * (8.01f - 8.0f * n));
-
-// VCF
-#define ASP_VCF_CUTOFF          23 // x*x*x
-#define ASP_VCF_RES             24 // -0.5 to 0.5
-#define ASP_VCF_MODE            25 // Int param
-#define ASP_VCF_FOLLOW          26 // -0.5 to 0.5
-
-// LFO
-#define ASP_LFO_RATE            27 // (x*x*35+0.1)*SAMPLE_PERIOD
-#define ASP_LFO_WAVE_TYPE       28 // Int param
-#define ASP_LFO_ATTACK          29 // 1.0f / (SAMPLE_RATE * (8.01f - 8.0f * atk1));
-#define ASP_LFO_WOBBLE          30 // -0.5f to 0.5f
-#define ASP_LFO_OSC1_TUNE       31 // -0.5f to 0.5f
-#define ASP_LFO_OSC1_VOLUME     32 // -0.5f to 0.5f
-#define ASP_LFO_OSC1_SHAPE      33 // -0.5f to 0.5f
-#define ASP_LFO_OSC2_TUNE       34 // -0.5f to 0.5f
-#define ASP_LFO_OSC2_VOLUME     35 // -0.5f to 0.5f
-#define ASP_LFO_OSC2_SHAPE      36 // -0.5f to 0.5f
-#define ASP_LFO_VCF_CUTOFF      37 // -0.5 to 0.5
-#define ASP_LFO_VCF_RES         38 // -0.5 to 0.5
-
-#define ASP_SOUND_TYPE          39 // Int param
-
-#define ASP_NUM_PARAMS          40
+enum class SubParameter
+{
+	// General
+	Tuning,
+	Drive,
+	Gain,
+	// Delay
+	DelayTime,
+	DelayFeedback,
+	DelayShear,
+	DelayMode,
+	// DCO
+	DcoWaveType1,
+	DcoTune1,
+	DcoVol1,
+	DcoWs1,
+	DcoWaveType2,
+	DcoTune2,
+	DcoVol2,
+	DcoWs2,
+	// Env
+	EnvAttack1,
+	EnvDecay1,
+	EnvSustain1,
+	EnvRelease1,
+	EnvAttack2,
+	EnvDecay2,
+	EnvSustain2,
+	EnvRelease2,
+	// Filter
+	VcfCutoff,
+	VcfRes,
+	VcfMode,
+	VcfFollow,
+	// LFO
+	LfoRate,
+	LfoWaveType,
+	LfoAttack,
+	LfoWobble,
+	LfoOsc1Tune,
+	LfoOsc1Volume,
+	LfoOsc1Shape,
+	LfoOsc2Tune,
+	LfoOsc2Volume,
+	LfoOsc2Shape,
+	LfoVcfCutoff,
+	LfoVcfRes,
+	SoundType,
+	Count
+};
 
 // Sound types
-#define SOUND_TYPE_POLY         0
-#define SOUND_TYPE_MONO         1
-#define SOUND_TYPE_PIANO        2
-#define SOUND_TYPE_BASS         3
-#define NUM_SOUNT_TYPES         4
+enum class PresetType
+{
+	Poly,
+	Mono,
+	Piano,
+	Bass,
+};
 
 // Delay modes
-#define DELAY_MODE_OFF          0
-#define DELAY_MODE_NORMAL       1
-#define DELAY_MODE_SLAPBACK     2
-#define DELAY_MODE_GLITCH       3
-#define NUM_DELAY_MODES         4
+enum class DelayMode
+{
+	Off,
+	Feedback, // infinite repeats
+	Slapback, // one repeat
+	Glitch, // time varying
+};
 
-// Filter modes
-#define FILTER_MODE_OFF         0
-#define FILTER_MODE_LP          1
-#define FILTER_MODE_HP          2
-#define NUM_FILTER_MODES        3
-
-#endif // SUB_SYNTH_PARAMS_H
+}

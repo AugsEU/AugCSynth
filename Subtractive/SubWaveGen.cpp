@@ -54,42 +54,6 @@ void SynthInit(void)
 
 	ZeroOutParams();
 	subState.mFilter.Init();
-
-	// Default test preset
-	SetFloatParam(ASP_GAIN, 0.7f);
-	SetIntParam(ASP_DCO_WAVE_TYPE_1, (int)WaveType::Saw);
-	SetFloatParam(ASP_DCO_TUNE_1, 1.0f);
-	SetFloatParam(ASP_DCO_VOL_1, 0.75f);
-	SetFloatParam(ASP_DCO_WS_1, 0.5f);
-
-	SetIntParam(ASP_DCO_WAVE_TYPE_2, (int)WaveType::Square);
-	SetFloatParam(ASP_DCO_TUNE_2, 1.5f);
-	SetFloatParam(ASP_DCO_VOL_2, 0.8f);
-	SetFloatParam(ASP_DCO_WS_2, 0.2f);
-	
-	SetFloatParam(ASP_ENV_ATTACK1, 0.002);
-	SetFloatParam(ASP_ENV_DECAY1, 0.000005f);
-	SetFloatParam(ASP_ENV_SUSTAIN1, 0.76f);
-	SetFloatParam(ASP_ENV_RELEASE1, 0.00005f);
-
-	SetFloatParam(ASP_ENV_ATTACK2, 0.0002);
-	SetFloatParam(ASP_ENV_DECAY2, 0.00005f);
-	SetFloatParam(ASP_ENV_SUSTAIN2, 0.96f);
-	SetFloatParam(ASP_ENV_RELEASE2, 0.0005f);
-
-	SetFloatParam(ASP_LFO_RATE, 4.0f * (1.0f / (float)SAMPLE_RATE));
-	SetFloatParam(ASP_LFO_WOBBLE, 0.2f * (1.0f / (float)SAMPLE_RATE));
-	SetFloatParam(ASP_LFO_OSC1_VOLUME, 0.25f);
-	SetFloatParam(ASP_LFO_VCF_CUTOFF, -0.2f);
-
-	SetIntParam(ASP_VCF_MODE, FILTER_MODE_LP);
-	SetFloatParam(ASP_VCF_RES, 0.4f);
-	SetFloatParam(ASP_VCF_CUTOFF, 0.5f);
-
-	SetIntParam(ASP_DELAY_MODE, DELAY_MODE_NORMAL);
-
-	SetFloatParam(ASP_DELAY_TIME, 0.2f);
-	SetFloatParam(ASP_DELAY_FEEDBACK, 0.2f);
 }
 
 
@@ -105,11 +69,11 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 	uint32_t rndValue = GetNextRand();
 
 	// Delay
-	uint32_t delayMode = GetIntParam(ASP_DELAY_MODE);
+	DelayMode delayMode = (DelayMode)GetIntParam(SubParameter::DelayMode);
 
 	SubState& subState = State().mSubState;
 	
-	if(delayMode == DELAY_MODE_GLITCH)
+	if(delayMode == DelayMode::Glitch)
 	{
 		if(rndValue % 13 == 0)
 		{
@@ -128,8 +92,8 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		subState.mDelayReadOffsetOffset = 0;
 	}
 
-	int32_t delayReadOffset = GetFloatParam(ASP_DELAY_TIME) * DELAY_BUFFER_LEN + subState.mDelayReadOffsetOffset;
-	if(delayMode == DELAY_MODE_OFF)
+	int32_t delayReadOffset = GetFloatParam(SubParameter::DelayTime) * DELAY_BUFFER_LEN + subState.mDelayReadOffsetOffset;
+	if(delayMode == DelayMode::Off)
 	{
 		subState.mDelayReadOffset = 0;
 		delayReadOffset = 0;
@@ -147,39 +111,39 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 			subState.mDelayReadOffsetOffset = 0;
 		}
 	}
-	int32_t delayFeedbackVol = (uint32_t)(GetFloatParam(ASP_DELAY_FEEDBACK) * 32768.0f);
-	uint16_t delayGlide = (uint16_t)(GetFloatParam(ASP_DELAY_SHEAR) * 275.0f) + 2;
+	int32_t delayFeedbackVol = (uint32_t)(GetFloatParam(SubParameter::DelayFeedback) * 32768.0f);
+	uint16_t delayGlide = (uint16_t)(GetFloatParam(SubParameter::DelayShear) * 275.0f) + 2;
 
 	uint32_t delayReadHead;
 
 	// DCO
-	WaveType waveType1 = (WaveType)GetIntParam(ASP_DCO_WAVE_TYPE_1);
-	WaveType waveType2 = (WaveType)GetIntParam(ASP_DCO_WAVE_TYPE_2);
-	float tune1 = GetFloatParam(ASP_DCO_TUNE_1);
-	float tune2 = GetFloatParam(ASP_DCO_TUNE_2);
-	float shape1;// = 1.5f * GetFloatParam(ASP_DCO_WS_1) - 0.25f;
-	float shape2;// = 1.5f * GetFloatParam(ASP_DCO_WS_2) - 0.25f;
-	float shape1Lfo = GetFloatParam(ASP_LFO_OSC1_SHAPE);
-	float shape2Lfo = GetFloatParam(ASP_LFO_OSC2_SHAPE);
+	WaveType waveType1 = (WaveType)GetIntParam(SubParameter::DcoWaveType1);
+	WaveType waveType2 = (WaveType)GetIntParam(SubParameter::DcoWaveType2);
+	float tune1 = GetFloatParam(SubParameter::DcoTune1);
+	float tune2 = GetFloatParam(SubParameter::DcoTune2);
+	float shape1;// = 1.5f * GetFloatParam(SubParameter::DCO_WS_1) - 0.25f;
+	float shape2;// = 1.5f * GetFloatParam(SubParameter::DCO_WS_2) - 0.25f;
+	float shape1Lfo = GetFloatParam(SubParameter::LfoOsc1Shape);
+	float shape2Lfo = GetFloatParam(SubParameter::LfoOsc2Shape);
 
 	// VCF
-	subState.mFilter.SetFilterType(GetIntParam(ASP_VCF_MODE));
-	float filterFreqMod, filterFreq = GetFloatParam(ASP_VCF_CUTOFF);
-	float filterRes = GetFloatParam(ASP_VCF_RES);
-	float filterFreqLfo = GetFloatParam(ASP_LFO_VCF_CUTOFF);
-	float filterResLfo = GetFloatParam(ASP_LFO_VCF_RES);
-	float filterFollow = GetFloatParam(ASP_VCF_FOLLOW);
+	subState.mFilter.SetFilterType((FilterMode)GetIntParam(SubParameter::VcfMode));
+	float filterFreqMod, filterFreq = GetFloatParam(SubParameter::VcfCutoff);
+	float filterRes = GetFloatParam(SubParameter::VcfRes);
+	float filterFreqLfo = GetFloatParam(SubParameter::LfoVcfCutoff);
+	float filterResLfo = GetFloatParam(SubParameter::LfoVcfRes);
+	float filterFollow = GetFloatParam(SubParameter::VcfFollow);
 
 	// LFO
 	float lfoValue;
-	WaveType lfoWaveSelect = (WaveType)GetIntParam(ASP_LFO_WAVE_TYPE);
-	float lfoPhaseInc = GetFloatParam(ASP_LFO_RATE);
+	WaveType lfoWaveSelect = (WaveType)GetIntParam(SubParameter::LfoWaveType);
+	float lfoPhaseInc = GetFloatParam(SubParameter::LfoRate);
 	float lfoWobblePhaseInc = lfoPhaseInc * 0.061804697157f;
-	float lfoWobble = GetFloatParam(ASP_LFO_WOBBLE);
+	float lfoWobble = GetFloatParam(SubParameter::LfoWobble);
 
 	// Drive & Gain
-	float gain = GetFloatParam(ASP_GAIN);
-	float drive = GetFloatParam(ASP_DRIVE);
+	float gain = GetFloatParam(SubParameter::Gain);
+	float drive = GetFloatParam(SubParameter::Drive);
 
 	for(int i = 0; i < VOICE_POLYPHONY; i++)
 	{
@@ -195,8 +159,8 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 
 		/*--- Generate waveform ---*/
 		float	y = 0.0f;
-		shape1 = 1.5f * GetFloatParam(ASP_DCO_WS_1) * ComputeLfoMult(lfoValue, shape1Lfo) - 0.25f;
-		shape2 = 1.5f * GetFloatParam(ASP_DCO_WS_2) * ComputeLfoMult(lfoValue, shape2Lfo) - 0.25f;
+		shape1 = 1.5f * GetFloatParam(SubParameter::DcoWs1) * ComputeLfoMult(lfoValue, shape1Lfo) - 0.25f;
+		shape2 = 1.5f * GetFloatParam(SubParameter::DcoWs2) * ComputeLfoMult(lfoValue, shape2Lfo) - 0.25f;
 
 		for(int i = 0; i < VOICE_POLYPHONY; i++)
 		{
@@ -262,7 +226,7 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		*outp++ = (int16_t)value;
 
 		/*--- Delay write ---*/
-		if (delayMode == DELAY_MODE_SLAPBACK)
+		if (delayMode == DelayMode::Slapback)
 		{
 			value = noDelayValue; // Just write delay without feedback
 		}

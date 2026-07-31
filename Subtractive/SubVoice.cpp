@@ -73,17 +73,17 @@ void SubVoice::VoiceOff()
 
 void SubVoice::PrepSampleBlock()
 {
-    mComp1.mEnv.mAttack = GetFloatParam(ASP_ENV_ATTACK1);
-    mComp1.mEnv.mDecay = GetFloatParam(ASP_ENV_DECAY1);
-    mComp1.mEnv.mSustain = GetFloatParam(ASP_ENV_SUSTAIN1);
-    mComp1.mEnv.mRelease = GetFloatParam(ASP_ENV_RELEASE1);
+    mComp1.mEnv.mAttack = GetFloatParam(SubParameter::EnvAttack1);
+    mComp1.mEnv.mDecay = GetFloatParam(SubParameter::EnvDecay1);
+    mComp1.mEnv.mSustain = GetFloatParam(SubParameter::EnvSustain1);
+    mComp1.mEnv.mRelease = GetFloatParam(SubParameter::EnvRelease1);
     
-    mComp2.mEnv.mAttack = GetFloatParam(ASP_ENV_ATTACK2);
-    mComp2.mEnv.mDecay =  GetFloatParam(ASP_ENV_DECAY2);
-    mComp2.mEnv.mSustain = GetFloatParam(ASP_ENV_SUSTAIN2);
-    mComp2.mEnv.mRelease = GetFloatParam(ASP_ENV_RELEASE2);
+    mComp2.mEnv.mAttack = GetFloatParam(SubParameter::EnvAttack2);
+    mComp2.mEnv.mDecay =  GetFloatParam(SubParameter::EnvDecay2);
+    mComp2.mEnv.mSustain = GetFloatParam(SubParameter::EnvSustain2);
+    mComp2.mEnv.mRelease = GetFloatParam(SubParameter::EnvRelease2);
 
-    mLfoDelta = GetFloatParam(ASP_LFO_ATTACK);
+    mLfoDelta = GetFloatParam(SubParameter::LfoAttack);
 }
 
 float SubVoice::GetSample(
@@ -98,20 +98,20 @@ float SubVoice::GetSample(
     }
     lfoValue *= mLfoAmount;
 
-    const float osc1TuneLFO = FastUnitExp(GetFloatParam(ASP_LFO_OSC1_TUNE) * lfoValue);
-    const float osc2TuneLFO = FastUnitExp(GetFloatParam(ASP_LFO_OSC2_TUNE) * lfoValue);
+    const float osc1TuneLFO = FastUnitExp(GetFloatParam(SubParameter::LfoOsc1Tune) * lfoValue);
+    const float osc2TuneLFO = FastUnitExp(GetFloatParam(SubParameter::LfoOsc2Tune) * lfoValue);
     const float dt = mFreq;
 
     // Osc1
     float osc1 = mComp1.DoNextSample(dt * tune1 * osc1TuneLFO, waveType1, shape1);
-    osc1 *= GetFloatParam(ASP_DCO_VOL_1);
-    osc1 *= ComputeLfoMult(lfoValue, GetFloatParam(ASP_LFO_OSC1_VOLUME));
+    osc1 *= GetFloatParam(SubParameter::DcoVol1);
+    osc1 *= ComputeLfoMult(lfoValue, GetFloatParam(SubParameter::LfoOsc1Volume));
 
 #if !MONO_OSC
     // Osc2
     float osc2 = mComp2.DoNextSample(dt * tune2 * osc2TuneLFO, waveType2, shape2);
-    osc2 *= GetFloatParam(ASP_DCO_VOL_2);
-    osc2 *= ComputeLfoMult(lfoValue, GetFloatParam(ASP_LFO_OSC2_VOLUME));
+    osc2 *= GetFloatParam(SubParameter::DcoVol2);
+    osc2 *= ComputeLfoMult(lfoValue, GetFloatParam(SubParameter::LfoOsc2Volume));
 
     return osc1 + osc2;
 #else

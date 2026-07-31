@@ -6,6 +6,7 @@
 // ============================================================================
 // Includes
 // ============================================================================
+#include "Filter.h"
 
 namespace AugCSynth
 {
@@ -18,7 +19,7 @@ class SVFilter
 	SVFilter();
 	void SetFilterFreq(float val) { mFreq = val; }
 	void SetFilterRes(float val) { mRes = val; }
-	void SetFilterType(uint8_t type);
+	void SetFilterType(FilterMode type);
 
 	float NextSample(float smpl);
 

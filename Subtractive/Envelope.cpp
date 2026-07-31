@@ -42,8 +42,8 @@ void Envelope::NextSample()
         if(mVolume <= mSustain)
         {
             mVolume = mSustain;
-            uint32_t soundType = GetIntParam(ASP_SOUND_TYPE);
-            if(soundType == SOUND_TYPE_POLY || soundType == SOUND_TYPE_MONO)
+            PresetType soundType = (PresetType)GetIntParam(SubParameter::SoundType);
+            if(soundType == PresetType::Poly || soundType == PresetType::Mono)
             {
                 mSection = ES_SUSTAIN;
             }

@@ -35,7 +35,7 @@ float LowpassClip(float n);
 
 void NLFilter::Init()
 {
-	mType = FILTER_MODE_OFF;
+	mType = FilterMode::Off;
 	mSample0 = 0;
 	mSample1 = 0;
 	mQ = 0.9f;
@@ -64,14 +64,14 @@ void NLFilter::SetFilterRes(float val)
     }
 }
 
-void NLFilter::SetFilterType(uint8_t type)
+void NLFilter::SetFilterType(FilterMode type)
 {
 	mType = type;
 }
 
 float NLFilter::NextSample(float smpl)
 {
-	if(mType == FILTER_MODE_OFF) // Bypass
+	if(mType == FilterMode::Off) // Bypass
 	{
         return smpl;
     }
@@ -103,11 +103,11 @@ float NLFilter::NextSample(float smpl)
 	mSample0 = FilterClip(mSample0) + 2.0f * fg * (dx - 2.0f * r * y0);
 	mSample1 += 2.0f * fg * y0;
 
-	if(mType == FILTER_MODE_LP) // Low pass
+	if(mType == FilterMode::LowPass) // Low pass
 	{
 		return LowpassClip(y1);
 	}
-	else // High pass
+	else if(mType == FilterMode::HighPass)
 	{
 		const float efg = 2*r*y0;
 		const float h = s - efg - y1;

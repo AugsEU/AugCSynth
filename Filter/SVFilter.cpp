@@ -20,12 +20,12 @@ SVFilter::SVFilter()
 
 	mFreq = 0.0f;
 	mRes = 0.0f;
-	SetFilterType(FILTER_MODE_HP);
+	SetFilterType(FilterMode::HighPass);
 }
 
-void SVFilter::SetFilterType(uint8_t type)
+void SVFilter::SetFilterType(FilterMode type)
 {
-	mTypeMult = (float)(type == FILTER_MODE_LP);
+	mTypeMult = (float)(type == FilterMode::LowPass);
 }
 
 float SVFilter::NextSample(float sample)
