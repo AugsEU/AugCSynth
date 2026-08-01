@@ -69,13 +69,4 @@ enum class PresetType
 	Bass,
 };
 
-// Delay modes
-enum class DelayMode
-{
-	Off,
-	Feedback, // infinite repeats
-	Slapback, // one repeat
-	Glitch, // time varying
-};
-
 }

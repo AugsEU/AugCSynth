@@ -8,6 +8,7 @@
 // ============================================================================
 #include "Oscillator.h"
 #include <Filter/NLFilter.h>
+#include <Delay/Delay.h>
 
 // ============================================================================
 // Constants
@@ -21,14 +22,11 @@ namespace AugCSynth::Subtractive
 
 struct SubState
 {
-	uint16_t mDelayBuffer[DELAY_BUFFER_LEN];
-	uint32_t mDelayWriteHead;
-	int32_t mDelayReadOffset;
-	int32_t mDelayReadOffsetOffset;
-
 	Oscillator mLFO;
 	Oscillator mLFOWobbler;
 	NLFilter mFilter;
+	Delay mDelay;
+	
 	float mCurrLoudness;
 };
 

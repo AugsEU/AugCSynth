@@ -12,6 +12,8 @@
 #include "Utilities/QwertyMath.h"
 #include <Config.h>
 #include <AugCState.h>
+#include <Delay/Delay.h>
+#include <Arduino.h>
 
 
 namespace AugCSynth::Subtractive
@@ -21,7 +23,7 @@ namespace AugCSynth::Subtractive
 // Constants
 // ============================================================================
 #define DELAY_BUFFER_LEN 48000
-#define DELAY_GLITCH_SIZE 2000
+
 #define LOUDNESS_ALPHA (0.001f)
 
 
@@ -39,13 +41,7 @@ void SynthInit(void)
 
 	SubState& subState = State().mSubState;
 
-	subState.mDelayWriteHead = 0;
-	subState.mDelayReadOffset = 0;
-	subState.mDelayReadOffsetOffset = 0;
-	for(int i = 0; i < DELAY_BUFFER_LEN; i++)
-	{
-		subState.mDelayBuffer[i] = 0;
-	}
+	subState.mDelay.Init();
 
 	subState.mLFO.Init();
 	subState.mLFOWobbler.Init();
@@ -64,57 +60,17 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 {
 	uint16_t pos;
 	int16_t* outp = buf;
-	int32_t value, noDelayValue;
-	int32_t delayValue;
-	uint32_t rndValue = GetNextRand();
+	int32_t value;
+
+	SubState& subState = State().mSubState;
 
 	// Delay
 	DelayMode delayMode = (DelayMode)GetIntParam(SubParameter::DelayMode);
-
-	SubState& subState = State().mSubState;
-	
-	if(delayMode == DelayMode::Glitch)
-	{
-		if(rndValue % 13 == 0)
-		{
-			if(rndValue % 3 == 0 && subState.mDelayReadOffsetOffset < DELAY_GLITCH_SIZE)
-			{
-				subState.mDelayReadOffsetOffset += DELAY_GLITCH_SIZE / 3;
-			}
-			else if (rndValue % 3 == 1 && subState.mDelayReadOffsetOffset > -DELAY_GLITCH_SIZE)
-			{
-				subState.mDelayReadOffsetOffset -= DELAY_GLITCH_SIZE / 3;
-			}
-		}
-	}
-	else
-	{
-		subState.mDelayReadOffsetOffset = 0;
-	}
-
-	int32_t delayReadOffset = GetFloatParam(SubParameter::DelayTime) * DELAY_BUFFER_LEN + subState.mDelayReadOffsetOffset;
-	if(delayMode == DelayMode::Off)
-	{
-		subState.mDelayReadOffset = 0;
-		delayReadOffset = 0;
-	}
-	else
-	{
-		if(delayReadOffset < 0) 
-		{
-			delayReadOffset = 0;
-			subState.mDelayReadOffsetOffset = 0;
-		}
-		else if(delayReadOffset >= DELAY_BUFFER_LEN)
-		{
-			delayReadOffset =  DELAY_BUFFER_LEN - 1;
-			subState.mDelayReadOffsetOffset = 0;
-		}
-	}
-	int32_t delayFeedbackVol = (uint32_t)(GetFloatParam(SubParameter::DelayFeedback) * 32768.0f);
+	int32_t delayReadOffset = GetFloatParam(SubParameter::DelayTime) * DELAY_BUFFER_LEN;
+	uint32_t delayFeedbackVol = (uint32_t)(GetFloatParam(SubParameter::DelayFeedback) * 32768.0f);
 	uint16_t delayGlide = (uint16_t)(GetFloatParam(SubParameter::DelayShear) * 275.0f) + 2;
 
-	uint32_t delayReadHead;
+	subState.mDelay.SetParams(delayMode, delayReadOffset, delayFeedbackVol, delayGlide);
 
 	// DCO
 	WaveType waveType1 = (WaveType)GetIntParam(SubParameter::DcoWaveType1);
@@ -191,27 +147,6 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		/*--- Delay ---*/
 		value = (int32_t)((32767.0f) * y);
 
-		// Delay read
-		if ((pos % delayGlide) == 0)
-		{
-			if(subState.mDelayReadOffset < delayReadOffset)
-			{
-				subState.mDelayReadOffset += 1;
-			}
-			else if (subState.mDelayReadOffset > delayReadOffset)
-			{
-				subState.mDelayReadOffset -= 1;
-			}
-		}
-
-		noDelayValue = value;
-		if(subState.mDelayReadOffset > 0)
-		{
-			delayReadHead = (subState.mDelayWriteHead + DELAY_BUFFER_LEN - subState.mDelayReadOffset) % DELAY_BUFFER_LEN;
-			delayValue = (int16_t)subState.mDelayBuffer[delayReadHead];
-			value += delayValue;
-		}
-
 		/*--- Write to buffer ---*/
 		if (value < -32768)
 		{
@@ -222,20 +157,11 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 			value = 32767;
 		}
 
-		*outp++ = (int16_t)value;
-		*outp++ = (int16_t)value;
+		int16_t value16 = (int16_t)value;
+		value16 = subState.mDelay.GetNextSample(value16);
 
-		/*--- Delay write ---*/
-		if (delayMode == DelayMode::Slapback)
-		{
-			value = noDelayValue; // Just write delay without feedback
-		}
-
-		value *= delayFeedbackVol;
-		value /= 32768;
-
-		subState.mDelayBuffer[subState.mDelayWriteHead] = (uint16_t)(int16_t)value;
-		subState.mDelayWriteHead = (subState.mDelayWriteHead + 1) % DELAY_BUFFER_LEN;
+		*outp++ = value16;
+		*outp++ = value16;
 	}
 }
 
