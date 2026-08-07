@@ -256,6 +256,8 @@ void SetTuning(Tuning tuning)
 	case Tuning::Wonky:
         State().mTuningTable = Wonky;
         break;
+    default:
+        break;
     }
 }
 

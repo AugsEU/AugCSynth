@@ -21,7 +21,8 @@ enum class WaveType
 	Sine,
 	Square,
 	Saw,
-	Organ
+	Organ,
+	Count
 };
 
 

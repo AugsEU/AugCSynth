@@ -21,6 +21,7 @@ enum class DelayMode
 	Feedback, // infinite repeats
 	Slapback, // one repeat
 	Glitch, // time varying
+    Count
 };
 
 class Delay

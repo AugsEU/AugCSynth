@@ -76,7 +76,7 @@ float NLFilter::NextSample(float smpl)
         return smpl;
     }
 
-	float out;
+	float out = 0.0f;
 	float r;
 	const float fg 	= mGain;
     const float samp0 = mSample0;

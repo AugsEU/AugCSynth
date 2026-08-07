@@ -23,5 +23,11 @@ float ComputeLoudnessMult(float loudness, float amount);
 float ShapeWave(float waveValue, float waveShape);
 float DrivenSample(float sample);
 
+// Param scaling utils
+float ScaleFreqParam(float x);
+float ScaleEnvParam(float x);
+float ScaleWeightHigh(float x);
+float ScaleLfoRate(float x);
+
 } // namespace AugCSynth
 

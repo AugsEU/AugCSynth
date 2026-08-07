@@ -22,6 +22,60 @@ namespace AugCSynth
 // ============================================================================
 
 
+SynthParamBounds::SynthParamBounds(int8_t maxValue)
+{
+    mBound = maxValue;
+}
+
+int8_t SynthParamBounds::ApplyDelta(int8_t value, int8_t delta)
+{
+    value += delta;
+    int8_t max = GetMaxValue();
+    int8_t min = GetMinValue();
+    if(value > max)
+    {
+        value = max;
+    }
+    else if(value < min)
+    {
+        value = min;
+    }
+
+	return value;
+}
+
+float SynthParamBounds::GetNormFloatValue(int8_t value)
+{
+    int8_t max = GetMaxValue();
+    int8_t min = GetMinValue();
+    if(min < 0 && value < 0)
+    {
+        return -(float)value / (float)min;
+    }
+
+    return (float)value / (float)max;
+}
+
+int8_t SynthParamBounds::GetMaxValue()
+{
+    if(mBound > 0)
+    {
+        return mBound;
+    }
+
+    return -mBound;
+}
+
+int8_t SynthParamBounds::GetMinValue()
+{
+    if(mBound < 0)
+    {
+        return mBound;
+    }
+
+    return 0;
+}
+
 // ============================================================================
 // Public functions
 // ============================================================================

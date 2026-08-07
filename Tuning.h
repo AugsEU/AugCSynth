@@ -36,6 +36,7 @@ enum class Tuning
 	JustB,
 	CircleOfFifths,
 	Wonky,
+	Count
 };
 
 	

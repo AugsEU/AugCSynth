@@ -3,6 +3,8 @@
 // ============================================================================
 #include "QwertyMath.h"
 
+#include "Config.h"
+
 namespace AugCSynth
 {
 
@@ -94,6 +96,38 @@ float DrivenSample(float sample)
     p *= sample;
     p += DRIVE_C;
     return p*sample;
+}
+
+float ScaleFreqParam(float x)
+{
+    x = x*x*x;
+    x = powf(4,x);
+    return x;
+}
+
+float ScaleEnvParam(float x)
+{
+    x*=x;
+    x = 1.0f - x;
+    x = 1.0f / ((float)SAMPLE_RATE * (8.0f + 0.01f - 8.0f * x));
+    return x;
+}
+
+float ScaleWeightHigh(float x)
+{
+    x = 1.0f - x;
+    x *= x * x;
+    x = 1.0f - x;
+    return x;
+}
+
+float ScaleLfoRate(float x)
+{
+    x *= x;
+    x *= 50.0f;
+    x += 0.1f;
+    x *= (1.0f / (float)SAMPLE_RATE);
+    return x;
 }
 
 } // namespace AugCSynth

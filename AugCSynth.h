@@ -10,6 +10,9 @@
 #include <Config.h>
 #include <Parameters.h>
 #include <Voice.h>
+#include <Filter/Filter.h>
+#include <Delay/Delay.h>
+#include <Parameters.h>
 
 #include <Subtractive/SubParams.h>
 #include <Subtractive/SubWaveGen.h>
