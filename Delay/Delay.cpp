@@ -89,6 +89,11 @@ void Delay::DoGlitch()
 
 int16_t Delay::GetNextSample(int16_t currentSample)
 {
+	if (mMode == DelayMode::Off)
+	{
+		return currentSample;
+	}
+
 	// Smooth delay time
 	int32_t targetOffset = mGlitchOffset + mTargetReadOffset;
 	if ((mWriteHead % mGlide) == 0)
