@@ -92,11 +92,12 @@ float NLFilter::NextSample(float smpl)
     } 
 
 	const float df = fg*fg;
-	const float s = FilterClip(smpl * 0.8f);
 	const float d0 = 1.0f / (1.0f + 2.0f * fg * r);
-
 	const float fdb = df * d0;
-	float y1= (fdb * s+ samp1 + fg * d0 * samp0) / (fdb + 1.0f);
+
+	const float s = FilterClip(smpl * 0.8f);
+
+	float y1= (fdb * s + samp1 + fg * d0 * samp0) / (fdb + 1.0f);
 	const float dx = s - y1;
 	const float y0 = (FilterClip(samp0) + fg * dx) * d0;
 

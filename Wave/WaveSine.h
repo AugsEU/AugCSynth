@@ -15,10 +15,9 @@ namespace AugCSynth
 /// @brief Sine with quadratic formula
 inline static float SineQuadraic(float phase)
 {
-    float x = phase - (float)(phase >= 0.5f);
-    float x2 = fabs(x) * -16.0f;
-	x2 += 8.0f;
-	x *= x2;
+    float x = phase - 0.5f;
+    x *= abs(x) - 0.5f;
+    x *= 16.0f;
 	return x;
 }
 
