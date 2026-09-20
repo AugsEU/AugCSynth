@@ -24,10 +24,7 @@ struct SubState
 {
 	Oscillator mLFO;
 	Oscillator mLFOWobbler;
-	NLFilter mFilter;
 	Delay mDelay;
-	
-	float mCurrLoudness;
 };
 
 }

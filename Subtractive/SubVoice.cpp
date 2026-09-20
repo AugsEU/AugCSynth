@@ -27,6 +27,8 @@ void SubVoice::Init()
     mComp1.Init();
 
     mComp2.Init();
+
+    mFilter.Init();
 }
 
 /// @brief Begin playing voice.
@@ -84,6 +86,8 @@ void SubVoice::PrepSampleBlock()
     mComp2.mEnv.mRelease = GetFloatParam(SubParameter::EnvRelease2);
 
     mLfoDelta = GetFloatParam(SubParameter::LfoAttack);
+
+    mFilter.SetFilterType((FilterMode)GetIntParam(SubParameter::VcfMode));
 }
 
 float SubVoice::GetSample(
@@ -101,6 +105,8 @@ float SubVoice::GetSample(
     const float osc1TuneLFO = FastUnitExp(GetFloatParam(SubParameter::LfoOsc1Tune) * lfoValue);
     const float osc2TuneLFO = FastUnitExp(GetFloatParam(SubParameter::LfoOsc2Tune) * lfoValue);
     const float dt = mFreq;
+    
+    float out;
 
     // Osc1
     float osc1 = mComp1.DoNextSample(dt * tune1 * osc1TuneLFO, waveType1, shape1);
@@ -113,10 +119,33 @@ float SubVoice::GetSample(
     osc2 *= GetFloatParam(SubParameter::DcoVol2);
     osc2 *= ComputeLfoMult(lfoValue, GetFloatParam(SubParameter::LfoOsc2Volume));
 
-    return osc1 + osc2;
+    out = osc1 + osc2;
 #else
-    return osc1;
+    out = osc1;
 #endif
+
+	// VCF
+    // Gather params
+	const float filterFreq = GetFloatParam(SubParameter::VcfCutoff);
+	const float filterRes = GetFloatParam(SubParameter::VcfRes);
+	const float filterFreqLfo = GetFloatParam(SubParameter::LfoVcfCutoff);
+	const float filterResLfo = GetFloatParam(SubParameter::LfoVcfRes);
+	const float filterFollow = GetFloatParam(SubParameter::VcfFollow);
+
+    // Calculate freq and res according to modulations
+    float filterFreqMod = ComputeLfoMult(lfoValue, filterFreqLfo) * mComp1.mEnv.mVolume;
+    filterFreqMod *= 1.0f + (mComp1.mEnv.mVolume - 1.0f) * filterFollow;
+    
+    float filterResMod = ComputeLfoMult(lfoValue, filterResLfo);
+    
+    // Apply params
+    mFilter.SetFilterFreq(filterFreq * filterFreqMod);
+    mFilter.SetFilterRes(filterRes * filterResMod);
+    
+    // Pass to filter
+    out = mFilter.NextSample(out);
+
+    return out;
 }
 
 float SubVoice::Eligibility(uint8_t note)

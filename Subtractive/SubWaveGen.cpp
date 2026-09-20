@@ -46,10 +46,7 @@ void SynthInit(void)
 	subState.mLFO.Init();
 	subState.mLFOWobbler.Init();
 
-	subState.mCurrLoudness = 0.0f;
-
 	ZeroOutParams();
-	subState.mFilter.Init();
 }
 
 
@@ -81,14 +78,6 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 	float shape2;// = 1.5f * GetFloatParam(SubParameter::DCO_WS_2) - 0.25f;
 	float shape1Lfo = GetFloatParam(SubParameter::LfoOsc1Shape);
 	float shape2Lfo = GetFloatParam(SubParameter::LfoOsc2Shape);
-
-	// VCF
-	subState.mFilter.SetFilterType((FilterMode)GetIntParam(SubParameter::VcfMode));
-	float filterFreqMod, filterFreq = GetFloatParam(SubParameter::VcfCutoff);
-	float filterRes = GetFloatParam(SubParameter::VcfRes);
-	float filterFreqLfo = GetFloatParam(SubParameter::LfoVcfCutoff);
-	float filterResLfo = GetFloatParam(SubParameter::LfoVcfRes);
-	float filterFollow = GetFloatParam(SubParameter::VcfFollow);
 
 	// LFO
 	float lfoValue;
@@ -126,19 +115,7 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 					shape1, shape2, 
 					lfoValue);
 		}
-
-		/*--- Measure loudness ---*/
-		float sampLoud = fabsf(y) * 6.0f;
-		if(sampLoud > 1.0f) sampLoud = 1.0f;
-		subState.mCurrLoudness = LOUDNESS_ALPHA * sampLoud + (1.0f - LOUDNESS_ALPHA) * subState.mCurrLoudness;
-
-		/*--- Filter ---*/
-		y *= (1.0f / (VOICE_POLYPHONY + 1.0f)); // Normalise
-		filterFreqMod = ComputeLfoMult(lfoValue, filterFreqLfo);
-		filterFreqMod *=  ComputeLoudnessMult(subState.mCurrLoudness, filterFollow);
-		subState.mFilter.SetFilterFreq(filterFreq * filterFreqMod);
-		subState.mFilter.SetFilterRes(filterRes * ComputeLfoMult(lfoValue, filterResLfo));
-		y = subState.mFilter.NextSample(y);
+		y *= (1.0f / (VOICE_POLYPHONY + 1.0f));
 
 		/*--- Drive & Gain ---*/
 		y = drive * DrivenSample(y) + (1.0f - drive) * y;
@@ -158,6 +135,7 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		}
 
 		int16_t value16 = (int16_t)value;
+		printf("V: %d\n", value16);
 		value16 = subState.mDelay.GetNextSample(value16);
 
 		*outp++ = value16;

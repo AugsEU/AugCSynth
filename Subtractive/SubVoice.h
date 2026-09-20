@@ -11,7 +11,7 @@
 #include <math.h>
 #include "Oscillator.h"
 #include "Envelope.h"
-
+#include "Filter/NLFilter.h"
 
 
 namespace AugCSynth::Subtractive
@@ -52,6 +52,8 @@ public:
 
     VoiceComponent mComp1;
     VoiceComponent mComp2;
+
+    NLFilter mFilter;
 
     float mLfoDelta;
     float mLfoAmount;
