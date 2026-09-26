@@ -6,7 +6,7 @@
 
 #include "Parameters.h"
 #include "Subtractive/SubParams.h"
-#include "Utilities/QwertyMath.h"
+#include "Utilities/SynthMath.h"
 #include <Config.h>
 
 #define MONO_OSC 0

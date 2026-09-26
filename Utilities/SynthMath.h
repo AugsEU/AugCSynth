@@ -21,7 +21,6 @@ float FastUnitExp(float x);
 float ComputeLfoMult(float lfoValue, float lfoAmount);
 float ComputeLoudnessMult(float loudness, float amount);
 float ShapeWave(float waveValue, float waveShape);
-float DrivenSample(float sample);
 
 // Param scaling utils
 float ScaleFreqParam(float x);

@@ -9,10 +9,11 @@
 #include "Voice.h"
 #include "Parameters.h"
 #include <Filter/NLFilter.h>
-#include "Utilities/QwertyMath.h"
+#include "Utilities/SynthMath.h"
 #include <Config.h>
 #include <AugCState.h>
 #include <Delay/Delay.h>
+#include <Drive/Drive.h>
 #include <Arduino.h>
 
 
@@ -118,7 +119,7 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		y *= (1.0f / (VOICE_POLYPHONY + 1.0f));
 
 		/*--- Drive & Gain ---*/
-		y = drive * DrivenSample(y) + (1.0f - drive) * y;
+		y = DriveSample(DriveMode::RatioDrive, y, drive);
 		y *= gain;
 		
 		/*--- Delay ---*/

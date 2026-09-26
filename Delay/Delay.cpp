@@ -3,7 +3,7 @@
 // ============================================================================
 #include "Delay.h"
 #include <string.h>
-#include "Utilities/QwertyMath.h"
+#include "Utilities/SynthMath.h"
 
 
 

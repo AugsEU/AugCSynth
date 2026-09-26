@@ -2,7 +2,7 @@
 // Inline
 // ============================================================================
 #include "WaveAll.h"
-#include <Utilities/QwertyMath.h>
+#include <Utilities/SynthMath.h>
 
 namespace AugCSynth {
 

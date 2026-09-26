@@ -1,7 +1,7 @@
 // ============================================================================
 // Includes
 // ============================================================================
-#include "QwertyMath.h"
+#include "SynthMath.h"
 
 #include "Config.h"
 
@@ -62,40 +62,6 @@ float ShapeWave(float waveValue, float waveShape)
     g += (1.0f - waveShape);
 
     return waveValue * g;
-}
-
-#define DRIVE_K (0.9f)
-#define DRIVE_M (4.0f*DRIVE_K + 1.0f)
-
-#define DRIVE_A (DRIVE_K*DRIVE_M - DRIVE_K)
-#define DRIVE_B ((DRIVE_K+1.0f)*(1.0f-DRIVE_M))
-#define DRIVE_C (DRIVE_M)
-
-float DrivenSample(float sample)
-{
-    float p;
-    if(signbit(sample))
-    {
-        sample = -sample;
-        if(sample > 1.0f)
-        {
-            return -1.0f;
-        }
-        p = DRIVE_B + DRIVE_A*sample;
-        p *= sample;
-        p += DRIVE_C;
-        return -p*sample;
-    }
-
-    if(sample > 1.0f)
-    {
-        return 1.0f;
-    }
-
-    p = DRIVE_B + DRIVE_A*sample;
-    p *= sample;
-    p += DRIVE_C;
-    return p*sample;
 }
 
 float ScaleFreqParam(float x)
