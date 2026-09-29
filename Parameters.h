@@ -37,6 +37,7 @@ private:
 // Public functions
 // ============================================================================
 
+#ifndef AUGCSYNTH_NO_STATE
 /// @brief Set all parameters to zero
 void ZeroOutParams();
 
@@ -100,5 +101,6 @@ SynthMode GetSynthMode();
 
 /// @brief Set current synth mode
 void SetSynthMode(SynthMode mode);
+#endif // !AUGCSYNTH_NO_STATE
 
 } // namespace AugCSynth

@@ -80,6 +80,7 @@ int8_t SynthParamBounds::GetMinValue()
 // Public functions
 // ============================================================================
 
+#ifndef AUGCSYNTH_NO_STATE
 void ZeroOutParams()
 {
 	memset(State().mParameters, 0x00, sizeof(State().mParameters));
@@ -114,5 +115,6 @@ void SetSynthMode(SynthMode mode)
 {
 	State().mMode = mode;
 }
+#endif // !AUGCSYNTH_NO_STATE
 
 } //namespace AugCSynth

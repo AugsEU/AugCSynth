@@ -12,6 +12,7 @@ namespace AugCSynth{
 // Public functions
 // ============================================================================
 
+#if !defined(AUGCSYNTH_NO_STATE)
 void AugCState::Init()
 {
 	std::memset(this, 0x00, sizeof(AugCState));
@@ -23,5 +24,6 @@ void AugCState::Init()
 
 	mFreeNoteSearchStart = 0;
 }
+#endif // !defined(AUGCSYNTH_NO_STATE)
 
 }

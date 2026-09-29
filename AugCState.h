@@ -48,6 +48,7 @@ enum class SynthMode : uint8_t
 // ============================================================================
 // State struct
 // ============================================================================
+#if !defined(AUGCSYNTH_NO_STATE)
 struct AugCState
 {
 	// Individual modes
@@ -69,6 +70,14 @@ struct AugCState
 
 	void Init();
 };
+#else // !defined(AUGCSYNTH_NO_STATE)
+// Empty class to compile but avoid large global state(i.e. save ram)
+struct AugCState
+{
+	void Init();
+};
+#endif // !defined(AUGCSYNTH_NO_STATE)
+
 
 // Assert this is plain-old-data
 static_assert(std::is_trivially_constructible_v<AugCState>);

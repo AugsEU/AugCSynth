@@ -14,6 +14,8 @@
 namespace AugCSynth::Subtractive
 {
 
+#ifndef AUGCSYNTH_NO_STATE
+
 // ============================================================================
 // Public functions
 // ============================================================================
@@ -178,4 +180,5 @@ float SubVoice::VoiceComponent::DoNextSample(float phaseInc, WaveType waveType, 
     return out;
 }
 
+#endif // !AUGCSYNTH_NO_STATE
 }

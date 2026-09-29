@@ -19,7 +19,7 @@
 
 namespace AugCSynth::Subtractive
 {
-
+#ifndef AUGCSYNTH_NO_STATE
 // ============================================================================
 // Constants
 // ============================================================================
@@ -143,5 +143,5 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 		*outp++ = value16;
 	}
 }
-
+#endif // !AUGCSYNTH_NO_STATE
 }

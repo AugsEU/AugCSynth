@@ -23,6 +23,8 @@ void Envelope::Init()
 
 void Envelope::NextSample()
 {
+#ifndef AUGCSYNTH_NO_STATE
+
     EnvelopeSection section = mSection;
 
     switch (section)
@@ -68,6 +70,8 @@ void Envelope::NextSample()
         }
         break;
     }
+
+#endif //!AUGCSYNTH_NO_STATE
 }
 
 }

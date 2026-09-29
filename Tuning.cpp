@@ -203,6 +203,7 @@ constexpr float TwentyFourTET[24] =
 // ============================================================================
 // Public functions
 // ============================================================================
+#ifndef AUGCSYNTH_NO_STATE
 
 void SetTuning(Tuning tuning)
 {
@@ -281,5 +282,7 @@ float NoteToFreq(uint8_t note)
 
     return freq;
 }
+
+#endif // !AUGCSYNTH_NO_STATE
 
 } // namespace AugCSynth

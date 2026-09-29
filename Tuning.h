@@ -43,6 +43,7 @@ enum class Tuning
 // ============================================================================
 // Public functions
 // ============================================================================
+#ifndef AUGCSYNTH_NO_STATE
 
 /// @brief Set tuning table
 void SetTuning(Tuning tuning);
@@ -50,4 +51,5 @@ void SetTuning(Tuning tuning);
 /// @brief Convert note number to freq
 float NoteToFreq(uint8_t note);
 
+#endif // AUGCSYNTH_NO_STATE
 } // namespace AugCSynth

@@ -18,7 +18,10 @@ namespace AugCSynth::Subtractive
 // ============================================================================
 // Public functions
 // ============================================================================
+#ifndef AUGCSYNTH_NO_STATE
+
 void SynthInit(void);
 void FillSoundBuffer(int16_t* buf, uint16_t samples);
 
+#endif // !AUGCSYNTH_NO_STATE
 }

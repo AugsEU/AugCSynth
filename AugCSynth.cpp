@@ -11,6 +11,7 @@ namespace AugCSynth{
 // ============================================================================
 // Public functions
 // ============================================================================
+#ifndef AUGCSYNTH_NO_STATE
 
 void Initialise()
 {
@@ -31,4 +32,5 @@ void FillSoundBuffer(int16_t* buf, uint16_t samples)
 	}
 }
 
+#endif // !AUGCSYNTH_NO_STATE
 }

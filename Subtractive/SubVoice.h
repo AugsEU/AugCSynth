@@ -16,6 +16,7 @@
 
 namespace AugCSynth::Subtractive
 {
+#ifndef AUGCSYNTH_NO_STATE
 
 // ============================================================================
 // Public types
@@ -58,5 +59,7 @@ public:
     float mLfoDelta;
     float mLfoAmount;
 };
+
+#endif // !AUGCSYNTH_NO_STATE
 
 }
